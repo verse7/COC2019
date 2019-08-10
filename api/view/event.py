@@ -1,11 +1,13 @@
 import jwt
+import json
+from werkzeug.utils import secure_filename
 from flask import Blueprint, request, jsonify, session, escape, current_app
 from api.model import db
 from api.form import csrf
 from api.model.Event import Event
 from api.model.User import User
 from api.form.EventForm import EventForm
-from api.util import form_errors, generate_api_response
+from api.util import form_errors, generate_api_response, CDNManager
 
 bp = Blueprint('events', __name__, url_prefix='/events')
 
@@ -13,25 +15,28 @@ bp = Blueprint('events', __name__, url_prefix='/events')
 # the csrf token will be set upon logging into the application
 csrf.exempt(bp)
 
-@bp.route('/', methods=['GET', 'POST'])
+@bp.route('', methods=['GET', 'POST'])
 def create_event():
   if request.method == 'GET':
     events = [{'title': e.title, 'location': e.location, 
                 'manpower_quota': e.manpower_quota, 'attendees': e.attendees } 
-              for o in Event.query.all()]
+              for e in Event.query.all()]
     
     response = generate_api_response(20, 'success', 
-                ['Successfully fetched all events'], orders, 200)
+                ['Successfully fetched all events'], {'events': events}, 200)
   else:
-    form = EventForm.from_json(request.json)
+    form = EventForm()
 
     if form.validate_on_submit():
-      title = form.title.data
-      location = form.title.data
-      manpower_quota = form.manpower_quota.data
-      
       try:
-        event = Event(title, location, manpower_quota)
+        image = form.image.data
+        details = json.loads(form.details.data.replace('\'', '"'))
+        filename = secure_filename(image.filename)
+
+        CDNManager().upload(image, filename)
+
+        event = Event(CDNManager().get_file_url(filename), escape(details['title']), escape(details['location']), 
+                        escape(details['manpower_quota']))
         db.session.add(event)
         db.session.commit()
         response = generate_api_response(21, 'success', 

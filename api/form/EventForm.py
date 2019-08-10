@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField
-from wtforms.validators import InputRequired, Email
+from flask_wtf.file import FileField, FileAllowed
+from wtforms.validators import InputRequired
+from .JSONField import JSONField
 
 class EventForm(FlaskForm):
   class Meta:
     csrf = False
-  title = StringField('title', validators=[InputRequired()])
-  location = StringField('location', validators=[InputRequired()])
-  manpower_quota = IntegerField('manpower_quota', validators=[InputRequired()])
+  image = FileField('photo', validators=[FileAllowed(['jpg','jpeg', 'Only jpeg images are accepted!'])])
+  details = JSONField('details', validators=[InputRequired()])
