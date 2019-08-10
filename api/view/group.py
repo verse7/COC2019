@@ -38,4 +38,14 @@ def create_group(user):
 
   data, status = response
   return jsonify(data), status
-    
+
+
+@bp.route('/', methods=["GET"])
+def get_groups():
+  data = [{"id": g.id, "name": g.name} for g in Group.query.all()]
+  
+  response = generate_api_response(21, 'success',
+              ['Successfully fetched groups'], {"groups":data}, 200)
+
+  data, status = response
+  return jsonify(data), status  
