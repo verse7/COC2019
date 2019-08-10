@@ -18,15 +18,24 @@ def register():
   form = RegistrationForm.from_json(request.json)
 
   if form.validate_on_submit():
+    firstname = escape(form.firstname.data)
+    lastname = escape(form.lastname.data)
     email = escape(form.email.data)
     password = escape(form.password.data)
     
     try:
-      user = User(email, password)
+      user = User(firstname, lastname, email, password)
       db.session.add(user)
       db.session.commit()
+
+      data = {}
+      data['id'] = user.id
+      data['firstname'] = user.firstname
+      data['lastname'] = user.lastname
+      data['email'] = user.email
+      
       response = generate_api_response(21, 'success', 
-                  ['Successfully registered user'], {}, 200)
+                  ['Successfully registered user'], data, 200)
     except:
       response = generate_api_response(41, 'error', 
                   ['A user already exists with these credentials'], {}, 200)
