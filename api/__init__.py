@@ -16,6 +16,8 @@ def create_api(test_config=None):
   csrf.init_app(api)
 
   from api.view import auth
+  from api.view import event
   api.register_blueprint(auth.bp)
+  api.register_blueprint(event.bp)
 
   return api
