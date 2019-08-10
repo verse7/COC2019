@@ -32,7 +32,7 @@ class Group(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   name = db.Column(db.String(120), nullable=False)
   date_created = db.Column(db.Date, nullable=False, default=datetime.datetime.utcnow())
-  members = db.relationship('User', secondary=user_groups, lazy=True,
+  members = db.relationship('User', secondary='user_groups', lazy=True,
     backref=db.backref('groups'))
 
   def __init__(self, name):
