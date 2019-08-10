@@ -51,6 +51,27 @@ def get_groups():
   return jsonify(data), status  
 
 
+@bp.route('/<group_id>', methods=['GET'])
+def get_group(group_id):
+  group = Group.query.get(group_id)
+  if not group:
+    response = generate_api_response(40, 'error', ['This group does not exist'], {}, 200)
+    data, status = response
+    return jsonify(data), status
+
+  data={}
+  data["id"] = group.id
+  data["name"] = group.name
+  data["members"] = [{"id": m.id, "firstname": m.firstname, "lastname": m.lastname, "points": m.points} for m in group.members]
+
+  response = generate_api_response(21, 'success',
+              ['Successfully fetched groups'], {"group":data}, 200)
+
+  data, status = response
+  return jsonify(data), status 
+
+
+
 @bp.route('/<group_id>', methods=["PUT"])
 @gives_user
 def add_user(user, group_id):
