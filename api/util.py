@@ -22,7 +22,11 @@ def gives_user(f):
     if not email:
       return generate_api_response(40, "error", ['Email header not present'], {}, 200)
 
-    user = User.query.filter_by(email=request.headers.get('email')).first()
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+      return generate_api_response(40, "error", ["User doesn't exist"], {}, 200)
+    # print(f'user recieved {user}')
     return f(user, *args, **kwargs)
   return decorated
 
