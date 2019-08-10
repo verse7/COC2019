@@ -15,12 +15,12 @@ csrf.exempt(bp)
 @bp.route('/', methods=['GET', 'POST'])
 def create_event():
   if request.method == 'GET':
-    events = {'events': [{'title': e.title, 'location': e.location, 
+    events = [{'title': e.title, 'location': e.location, 
                 'manpower_quota': e.manpower_quota, 'attendees': e.attendees } 
-              for e in Event.query.all()]}
+              for o in Event.query.all()]
     
     response = generate_api_response(20, 'success', 
-                ['Successfully fetched all events'], events, 200)
+                ['Successfully fetched all events'], orders, 200)
   else:
     form = EventForm.from_json(request.json)
 
@@ -45,3 +45,21 @@ def create_event():
   data, status = response
   return jsonify(data), status
 
+@bp.route('/subscribe', methods=['POST'])
+def subscribe(event_id, user_id):
+  try:
+    #get event_id and user_id parameters
+    event_id = request.args.get('event')
+    user_id = request.args.get('user')
+    
+    #find event with matching id
+    event = Event.query.filter_by(id=event_id).first()
+  
+    #find user with matching id
+    user = User.query.filter_by(id=user_id).first()
+    event.attendees.append(user)
+    db.session.add(event)
+    db.session.commit()
+  except:
+    response = generate_api_response(41, 'error', 
+                    ['An error has occurred'], {}, 200)
