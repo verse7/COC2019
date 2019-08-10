@@ -15,12 +15,12 @@ csrf.exempt(bp)
 @bp.route('/', methods=['GET', 'POST'])
 def create_event():
   if request.method == 'GET':
-    events = [{'title': e.title, 'location': e.location, 
+    events = {'events': [{'title': e.title, 'location': e.location, 
                 'manpower_quota': e.manpower_quota, 'attendees': e.attendees } 
-              for o in Event.query.all()]
+              for e in Event.query.all()]}
     
     response = generate_api_response(20, 'success', 
-                ['Successfully fetched all events'], orders, 200)
+                ['Successfully fetched all events'], events, 200)
   else:
     form = EventForm.from_json(request.json)
 
