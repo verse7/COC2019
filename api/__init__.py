@@ -9,7 +9,7 @@ def create_api(test_config=None):
   else:
     api.config.from_mapping(test_config)
 
-  from flask_cors import cors
+  from flask_cors import CORS
   cors = CORS(api, resources={r'*': {'origins': '*'}})
 
   from api.model import db
