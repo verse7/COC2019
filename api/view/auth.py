@@ -33,7 +33,7 @@ def register():
       data['firstname'] = user.firstname
       data['lastname'] = user.lastname
       data['email'] = user.email
-      
+
       response = generate_api_response(21, 'success', 
                   ['Successfully registered user'], data, 200)
     except:
