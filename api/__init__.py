@@ -17,7 +17,9 @@ def create_api(test_config=None):
 
   from api.view import auth
   from api.view import event
+  from api.view import group
   api.register_blueprint(auth.bp)
   api.register_blueprint(event.bp)
+  api.register_blueprint(group.bp)
 
   return api
