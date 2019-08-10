@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify, session, escape, current_app
 from api.model import db
 from api.form import csrf
 from api.model.Event import Event
+from api.model.User import User
 from api.form.EventForm import EventForm
 from api.util import form_errors, generate_api_response
 
@@ -15,12 +16,12 @@ csrf.exempt(bp)
 @bp.route('/', methods=['GET', 'POST'])
 def create_event():
   if request.method == 'GET':
-    events = {'events': [{'title': e.title, 'location': e.location, 
+    events = [{'title': e.title, 'location': e.location, 
                 'manpower_quota': e.manpower_quota, 'attendees': e.attendees } 
-              for e in Event.query.all()]}
+              for o in Event.query.all()]
     
     response = generate_api_response(20, 'success', 
-                ['Successfully fetched all events'], events, 200)
+                ['Successfully fetched all events'], orders, 200)
   else:
     form = EventForm.from_json(request.json)
 
@@ -45,3 +46,26 @@ def create_event():
   data, status = response
   return jsonify(data), status
 
+@bp.route('/<event_id>/subscribe', methods=['POST'])
+def subscribe(event_id):
+  try:
+    #get event_id and user_id parameters
+    user_id = request.args.get('user')
+
+    #find event with matching id
+    event = Event.query.filter_by(id=event_id).first()
+    
+    #find user with matching id
+    user = User.query.get(user_id)
+  
+    event.attendees.append(user)
+    db.session.add(event)
+    db.session.commit()
+    response = generate_api_response(21, 'success', 
+                    ['Successfully subscribed to an event'], {}, 200)
+  except:
+    response = generate_api_response(41, 'error', 
+                    ['An error has occurred'], {}, 200)
+  
+  data, status = response
+  return jsonify(data), status
