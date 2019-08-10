@@ -23,22 +23,22 @@ def register():
     email = escape(form.email.data)
     password = escape(form.password.data)
     
-    try:
-      user = User(firstname, lastname, email, password)
-      db.session.add(user)
-      db.session.commit()
+    # try:
+    user = User(firstname, lastname, email, password)
+    db.session.add(user)
+    db.session.commit()
 
-      data = {}
-      data['id'] = user.id
-      data['firstname'] = user.firstname
-      data['lastname'] = user.lastname
-      data['email'] = user.email
-      
-      response = generate_api_response(21, 'success', 
-                  ['Successfully registered user'], data, 200)
-    except:
-      response = generate_api_response(41, 'error', 
-                  ['A user already exists with these credentials'], {}, 200)
+    data = {}
+    data['id'] = user.id
+    data['firstname'] = user.firstname
+    data['lastname'] = user.lastname
+    data['email'] = user.email
+
+    response = generate_api_response(21, 'success', 
+                ['Successfully registered user'], data, 200)
+    # except:
+    #   response = generate_api_response(41, 'error', 
+    #               ['A user already exists with these credentials'], {}, 200)
 
   else:
     response = generate_api_response(40, 'error', 
