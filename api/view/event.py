@@ -49,7 +49,7 @@ def create_event():
 @bp.route('/<event_id>/subscribe', methods=['POST'])
 def subscribe(event_id):
   try:
-    #get event_id and user_id parameters
+    #get user_id parameters
     user_id = request.args.get('user')
 
     #find event with matching id
