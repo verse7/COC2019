@@ -18,7 +18,7 @@ csrf.exempt(bp)
 @bp.route('', methods=['GET', 'POST'])
 def create_event():
   if request.method == 'GET':
-    events = [{'title': e.title, 'location': e.location, 'image': e.image,
+    events = [{"id": e.id,'title': e.title, 'location': e.location, 'image': e.image,
                 'manpower_quota': e.manpower_quota, 'attendees': e.attendees } 
               for e in Event.query.all()]
     
