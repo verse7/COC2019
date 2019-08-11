@@ -18,7 +18,7 @@ csrf.exempt(bp)
 @bp.route('', methods=['GET', 'POST'])
 def create_event():
   if request.method == 'GET':
-    events = [{'title': e.title, 'location': e.location, 
+    events = [{'title': e.title, 'location': e.location, 'image': e.image,
                 'manpower_quota': e.manpower_quota, 'attendees': e.attendees } 
               for e in Event.query.all()]
     
@@ -28,22 +28,25 @@ def create_event():
     form = EventForm()
 
     if form.validate_on_submit():
-      try:
-        image = form.image.data
-        details = json.loads(form.details.data.replace('\'', '"'))
-        filename = secure_filename(image.filename)
+      # try:
+      image = form.image.data
+      details = json.loads(form.details.data.replace('\'', '"'))
+      print(details)
+      filename = secure_filename(image.filename)
 
-        CDNManager().upload(image, filename)
+      CDNManager().upload(image, filename)
 
-        event = Event(CDNManager().get_file_url(filename), escape(details['title']), escape(details['location']), 
-                        escape(details['manpower_quota']))
-        db.session.add(event)
-        db.session.commit()
-        response = generate_api_response(21, 'success', 
-                    ['Successfully created event'], {}, 200)
-      except:
-        response = generate_api_response(41, 'error', 
-                    ['A cleanup event is already created for this location'], {}, 200)
+      filename = CDNManager().get_file_url(filename)
+      event = Event(filename, details['title'], details['location'], 
+                    int(details['manpower_quota']))
+
+      db.session.add(event)
+      db.session.commit()
+      response = generate_api_response(21, 'success', 
+                  ['Successfully created event'], {}, 200)
+      # except:
+      #   response = generate_api_response(41, 'error', 
+      #               ['Something went wrong when creating this event'], {}, 200)
     else:
       response = generate_api_response(40, 'error', 
                 form_errors(form), {}, 200)
