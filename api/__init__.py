@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask_socketio import SocketIO, join_room, leave_room
 
 def create_api(test_config=None):
   api = Flask(__name__)
@@ -17,6 +18,17 @@ def create_api(test_config=None):
 
   from api.form import csrf
   csrf.init_app(api)
+
+  from api.ws import socketio
+  socketio.init_app(api, cors_allowed_origins='*')
+
+  @socketio.on('join')
+  def on_join(data):
+    join_room(data)
+
+  @socketio.on('leave')
+  def on_leave(data):
+    leave_room(data)
 
   from api.view import auth
   from api.view import event

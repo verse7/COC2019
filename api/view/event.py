@@ -8,6 +8,8 @@ from api.model.Event import Event
 from api.model.User import User
 from api.form.EventForm import EventForm
 from api.util import form_errors, generate_api_response, CDNManager
+from flask_socketio import send, emit, ConnectionRefusedError
+from api.ws import socketio
 
 bp = Blueprint('events', __name__, url_prefix='/events')
 
@@ -44,6 +46,11 @@ def create_event():
       db.session.commit()
       response = generate_api_response(21, 'success', 
                   ['Successfully created event'], {}, 200)
+
+      socketio.emit('new-event', json.dumps({
+        'image': event.image, 'title': event.title,
+        'location': event.location
+      }))
       # except:
       #   response = generate_api_response(41, 'error', 
       #               ['Something went wrong when creating this event'], {}, 200)
