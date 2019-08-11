@@ -19,7 +19,7 @@ csrf.exempt(bp)
 def create_event():
   if request.method == 'GET':
     events = [{"id": e.id,'title': e.title, 'location': e.location, 'image': e.image,
-                'manpower_quota': e.manpower_quota, 'attendees': e.attendees } 
+                'manpower_quota': e.manpower_quota, 'attendees': [{'id': at.id} for at in e.attendees]} 
               for e in Event.query.all()]
     
     response = generate_api_response(20, 'success', 
